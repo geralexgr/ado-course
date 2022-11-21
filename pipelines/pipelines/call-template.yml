@@ -1,0 +1,14 @@
+name: $(BuildDefinitionName)_$(date:yyyyMMdd)$(rev:.r)
+ 
+trigger: none
+pr: none
+ 
+variables:
+  - group: library
+  - name: blog
+    value: 'geralexgr.com'
+  
+stages :  
+  - stage: print_vars
+    jobs:
+      - template: templates/generic_pipeline.yml

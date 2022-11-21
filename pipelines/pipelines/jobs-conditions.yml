@@ -1,0 +1,48 @@
+trigger:
+- none
+
+parameters:
+  - name: state
+    displayName: select 1 for failure and 0 for success
+    type: number
+    values:
+      - 0
+      - 1 
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: stage1
+  displayName: stage1
+  jobs:
+  - job: job1
+    timeoutInMinutes: 60
+    displayName:  job1
+    steps:
+    - script: echo running task1
+      displayName: task1
+
+  - job: job2
+    dependsOn: job1
+    displayName:  job2
+    continueOnError: true
+    steps:
+    - script: exit ${{ parameters.state }}
+      displayName: task will succeed or fail based on user input
+
+  - job: job3
+    dependsOn: job2
+    condition: succeeded()
+    displayName:  job3
+    steps:
+    - script: echo task to be executed on success
+      displayName: execute on success
+
+  - job: job4
+    condition: failed()
+    dependsOn: job2
+    displayName:  job4
+    steps:
+    - script: echo task to be executed on failure
+      displayName: execute on failure

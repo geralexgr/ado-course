@@ -1,0 +1,60 @@
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- name: jmeter_url
+  value: https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.zip
+  
+
+stages:
+- stage: testing 
+  displayName: Using Jmeter for load testing
+  jobs:
+  - job: jmeterjob
+    displayName: Load test geralexgr.com with jmeter
+    steps:
+      
+      
+      - task: Bash@3
+        displayName: download jmeter on ArtifactStagingDirectory
+        inputs:
+          targetType: 'inline'
+          script: |
+            wget $(jmeter_url)
+            unzip apache-jmeter-5.5.zip
+          workingDirectory: '$(Build.ArtifactStagingDirectory)'
+
+      - task: Bash@3
+        displayName: perform loadtest using .jmx file
+        inputs:
+          targetType: 'inline'
+          script: |
+            mkdir $(Build.ArtifactStagingDirectory)/report
+            ./jmeter.sh -n -t $(Build.SourcesDirectory)/jmeter/geralexgr.com_plan.jmx -j $(Build.ArtifactStagingDirectory)/jmeter.log -l $(Build.ArtifactStagingDirectory)/results.jtl -e -o $(Build.ArtifactStagingDirectory)/report
+          workingDirectory: '$(Build.ArtifactStagingDirectory)/apache-jmeter-5.5/bin'
+
+      - task: Bash@3
+        displayName: download jmeter converter from testsmith-io/example-jmeter-azure-devops-integration
+        inputs:
+          targetType: 'inline'
+          script: |
+            mkdir python; cd python;
+            wget https://raw.githubusercontent.com/testsmith-io/example-jmeter-azure-devops-integration/aca4c714e5b3c8d8e6c2860c244eafea7f9d05f9/jtl_junit_converter.py
+          workingDirectory: '$(Build.ArtifactStagingDirectory)'
+
+      - task: Bash@3
+        displayName: convert jmeter report to junit 
+        inputs:
+          targetType: 'inline'
+          script: |
+            python jtl_junit_converter.py $(Build.ArtifactStagingDirectory)/results.jtl output.xml
+          workingDirectory: '$(Build.ArtifactStagingDirectory)/python'
+
+      - task: PublishTestResults@2
+        displayName: publish jmeter test results
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: '**/output*.xml'
+          searchFolder: '$(Build.ArtifactStagingDirectory)/python'

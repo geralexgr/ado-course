@@ -1,0 +1,36 @@
+trigger: none
+pr: none 
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: repo1
+      type: git
+      name: "projects"
+      ref: main
+    #   trigger:
+    #     branches:
+    #       include:
+    #         - main
+    
+    - repository: githubrepo
+      type: github
+      endpoint: geralexgr-ADO Intro
+      name: geralexgr/ado-course
+      ref: main
+
+steps:
+
+- checkout: self
+  displayName: checkout self repository
+  path: "s/Source"
+
+- checkout: repo1
+  displayName: checkout repo1
+  path: "s/code"
+
+- checkout: githubrepo
+  displayName: checkout githubrepo
+  path: "s/github"

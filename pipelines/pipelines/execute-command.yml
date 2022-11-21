@@ -1,0 +1,33 @@
+# RunShellScript
+# RunPowerShellScript
+
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- name: vm_name
+  value: "ubuntu"
+- name: rg_name
+  value: "vms"
+
+steps:
+
+
+- task: AzureCLI@2
+  displayName: display hostname
+  inputs:
+    azureSubscription: 'AzureMSDN-ADO Intro'
+    scriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    inlineScript: 'az vm run-command invoke --command-id RunShellScript --name $(vm_name) -g $(rg_name) --scripts "hostname"'
+
+- task: AzureCLI@2
+  displayName: display /etc/passwd
+  inputs:
+    azureSubscription: 'AzureMSDN-ADO Intro'
+    scriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    inlineScript: 'az vm run-command invoke --command-id RunShellScript --name $(vm_name) -g $(rg_name) --scripts "cat /etc/passwd"'

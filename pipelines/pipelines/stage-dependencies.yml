@@ -1,0 +1,92 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: Stage_Starting_Point
+  displayName: Starting point
+  jobs:
+  - job: Starting_point_Job
+    displayName:  Starting_point_Job
+    steps:
+    - script: echo pre processing
+      displayName: pre processing
+
+- stage: Stage_Comp_A
+  dependsOn: Stage_Starting_Point
+  displayName: Stage Component A
+  jobs:
+  - job: Job_Comp_A
+    displayName:  Job Component A
+    steps:
+    - script: echo building Component A
+      displayName: build component A
+
+- stage: Stage_Comp_B
+  
+  displayName: Stage Component B
+  dependsOn: Stage_Starting_Point
+  jobs:
+  - job: Job_Comp_B
+    displayName:  Job Component B
+    steps:
+    - script: echo building Component B
+      displayName: build component B
+
+- stage: Stage_Comp_C
+  dependsOn: Stage_Starting_Point
+  displayName: Stage Component C
+  jobs:
+  - job: Job_Comp_C
+    displayName:  Job Component C
+    steps:
+    - script: echo building Component C
+      displayName: build component C
+
+- stage: Stage_Artifacts
+  dependsOn: 
+  - Stage_Comp_A
+  - Stage_Comp_B
+  - Stage_Comp_C
+  displayName: Produce artifacts
+  jobs:
+  - job: Job_Artifacts
+    displayName:  Job Artifacts
+    steps:
+    - script: echo producing artifacts
+      displayName: producing artifacts
+
+- stage: Stage_Deploy_Prod
+  dependsOn: Stage_Artifacts
+  condition: succeeded('Stage_Artifacts')
+  displayName: Deploy application Prod
+  jobs:
+  - job: Job_Deploy_Prod
+    displayName:  Job Deployment
+    steps:
+    - script: echo deploying
+      displayName: deploying application Prod
+
+- stage: Stage_Rollback
+  dependsOn: Stage_Artifacts
+  condition: failed('Stage_Artifacts')
+  displayName: Rolling back
+  jobs:
+  - job: Job_Rollback
+    displayName:  Job Rollback
+    steps:
+    - script: echo rolling back application
+      displayName: roll back
+
+- stage: Stage_Deploy_DR
+  dependsOn: 
+  - Stage_Deploy_Prod
+  displayName: Deploy application DR
+  jobs:
+  - job: Job_Deploy_DR
+    displayName:  Job Deployment
+    steps:
+    - script: echo deploying
+      displayName: deploying application DR

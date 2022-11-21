@@ -1,0 +1,19 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+stages:
+- stage: stage1
+  displayName: display name for your stage
+  jobs:
+  - job: job1
+    displayName: display name for job1
+    steps:
+    - script: echo job1.task1
+      displayName: running job1.task1
+  - job: job2
+    displayName: display name for job2
+    steps:
+    - script: echo job2.task1
+      displayName: running job2.task1

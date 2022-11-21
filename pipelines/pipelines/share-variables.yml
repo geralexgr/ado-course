@@ -1,0 +1,41 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+jobs:
+  - job: job1
+    displayName: job1
+    steps:
+
+    - task: PowerShell@2
+      displayName: create runtime variable
+      name: task1
+      inputs:
+        targetType: 'inline'
+        script: |
+          $firstValue = 12345
+          $secondValue = 6789
+          Write-Host "##vso[task.setvariable variable=FirstToken]$firstValue"
+          Write-Host "##vso[task.setvariable variable=SecondToken;isoutput=true]$secondValue"
+
+    - task: PowerShell@2
+      displayName: print variable in different task in same job
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "$(FirstToken)"
+  
+  - job: job2
+    dependsOn: job1
+    displayName: job2
+    variables:
+    - name: job2var
+      value: $[dependencies.job1.outputs['task1.SecondToken']]
+    steps:
+    - task: PowerShell@2
+      displayName: print variable in different task in different job
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "$(job2var)"

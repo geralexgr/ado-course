@@ -1,0 +1,26 @@
+trigger:
+- none
+
+pr: none 
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: token-group
+
+steps:
+
+- task: PowerShell@2
+  displayName: trigger azure devops rest api
+  inputs:
+    targetType: 'inline'
+    script: |
+      $connectionToken="$(PAT)"
+      $base64AuthInfo= [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes(":$($connectionToken)"))
+      $URL = "https://dev.azure.com/GeralexGR/ADO%20Intro/_apis/pipelines/79/runs?api-version=7.1-preview.1"
+      
+        $body = '{"templateParameters": { "users":"[user1,user2]" }}'
+      
+      $Result = Invoke-RestMethod -Uri $URL -Headers @{authorization = "Basic $base64AuthInfo"} -Method Post -Body $body -ContentType "application/json"
+

@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-with-labels
+  labels:
+    tier: web
+    target: dev
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+    ports:
+    - containerPort: 80
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ng-svc
+spec:
+  selector:
+    target: dev
+  ports:
+    - port: 8100
+      targetPort: 80
+      name: web

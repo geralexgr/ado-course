@@ -1,0 +1,40 @@
+trigger: none
+pr: none
+
+parameters:
+- name: image
+  displayName: Pool Image
+  type: string
+  default: ubuntu-latest
+  values:
+    - windows-latest
+    - ubuntu-latest
+    - macOS-latest
+    
+pool:
+  vmImage: ubuntu-latest
+    
+variables:
+- name: myvar
+  value: ${{ parameters.image}}
+  
+steps:
+    
+    - task: PowerShell@2
+      displayName: execute task based on condition (ubuntu,windows)
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "Ubuntu or windows selected"
+      condition: or( eq(variables.myvar, 'ubuntu-latest'), eq(variables.myvar, 'windows-latest') )
+    - task: PowerShell@2
+      displayName: execute task2 based on condition (macOS-latest)
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "macOS selected"
+      condition: eq(variables.myvar, 'macOS-latest')    
+    
+    - ${{ if eq(parameters.image, 'windows-latest') }}: 
+      - script: echo running task as selected image is windows-latest
+        displayName: 'Run hidden task windows latest'

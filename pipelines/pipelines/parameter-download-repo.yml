@@ -1,0 +1,32 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+- name: repoparam
+  type: string
+  default: reponame
+- name: branchparam
+  type: string
+  default: main
+
+variables:
+  - name: repositoryvar
+    value: ${{parameters.repoparam}}
+  - name: branchvar
+    value: ${{parameters.branchparam}}
+
+
+resources:
+  repositories:
+    - repository: gitrepo
+      type: github
+      name: geralexgr/$(repositoryvar)
+      ref: $(branchvar)
+      endpoint: geralexgr-ADO Intro
+
+steps:
+- checkout: gitrepo
+  displayName: download repository

@@ -1,0 +1,45 @@
+trigger:
+- none
+
+# pool:
+#   vmImage: ubuntu-latest
+
+stages:
+  - stage: stage1
+    displayName: ubuntu pool
+    pool:
+      vmImage: ubuntu-latest
+    jobs:
+    - job: job1
+      steps:
+      - script: echo $(Build.ArtifactStagingDirectory)
+        displayName: Artifacts Staging Directory
+
+      - script: echo $(Build.SourcesDirectory)
+        displayName: Sources Directory
+
+      - script: echo $(Build.StagingDirectory)
+        displayName: Staging Directory
+
+      - script: echo $(Pipeline.Workspace)
+        displayName: Pipeline Workspace
+ 
+  - stage: stage2
+    displayName: windows pool
+    pool:
+      vmImage: windows-latest
+    jobs:
+    - job: job2
+      steps:
+      - script: echo $(Build.ArtifactStagingDirectory)
+        displayName: Artifacts Staging Directory
+
+      - script: echo $(Build.SourcesDirectory)
+        displayName: Sources Directory
+
+      - script: echo $(Build.StagingDirectory)
+        displayName: Staging Directory
+
+      - script: echo $(Pipeline.Workspace)
+        displayName: Pipeline Workspace
+  

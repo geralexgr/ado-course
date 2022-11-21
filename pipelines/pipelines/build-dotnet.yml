@@ -1,0 +1,35 @@
+trigger:
+- none
+
+pr: none 
+
+pool:
+  vmImage: windows-latest
+
+resources:
+  repositories:
+    - repository: repo1
+      type: git
+      name: "projects"
+      ref: main
+
+steps:
+- checkout: self
+  displayName: Download self repo
+  path: "s/Source"
+
+- checkout: repo1
+  displayName: Download projects repo
+  path: "s/projects"
+
+- task: UseDotNet@2
+  displayName: download .NET 6
+  inputs:
+    packageType: sdk
+    version: '6.0.x'
+    includePreviewVersions: true
+- task: MSBuild@1
+  displayName: build .NET solution
+  inputs:
+    solution: '$(Build.SourcesDirectory)/projects/ConsoleApp/*.sln'
+    msbuildArguments: '/p:Configuration=Debug /p:Platform="Any CPU"'

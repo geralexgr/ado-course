@@ -1,0 +1,10 @@
+jobs:
+  - job: print_job_inside_template
+    steps:
+          - task: PowerShell@2
+            displayName: print variables task
+            inputs:
+              targetType: 'inline'
+              script: |              
+                Write-Host blog name: "$(blog)"
+                Write-Host variable group inputName: "$(Name)"

@@ -1,0 +1,30 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+jobs:
+- job: job1
+  pool: server
+  steps:
+  - task: ManualValidation@0
+    inputs:
+      notifyUsers: 'example@email.com'
+      instructions: 'continue?'
+
+- job: executeOnFailure
+  displayName: execute on failure Job
+  dependsOn: job1
+  condition: failed()
+  steps:
+  - script: echo "fail execution..."
+    displayName: 'Rejected'
+
+- job: job2
+  displayName: execute on success Job
+  dependsOn: job1
+  condition: succeeded()
+  steps:
+  - script: echo "continue execution..."
+    displayName: approval is OK

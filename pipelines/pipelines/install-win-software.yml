@@ -1,0 +1,35 @@
+trigger:
+- none
+
+pool:
+  vmImage: windows-latest
+
+steps:
+- task: PowerShell@2
+  displayName: print node version before install
+  inputs:
+    targetType: 'inline'
+    script: 'node --version'
+
+- task: PowerShell@2
+  displayName: install node js
+  inputs:
+    targetType: 'inline'
+    script: |
+      $msiFilePath = "node.msi"
+      Invoke-WebRequest https://nodejs.org/dist/v18.7.0/node-v18.7.0-x64.msi -OutFile $msiFilePath
+                   
+      $MSIArguments = @(
+          "/i"
+          ('"{0}"' -f $msiFilePath)
+          "/qn"
+          "/norestart"
+      )               
+      Start-Process "msiexec.exe" -ArgumentList $MSIArguments -Wait -NoNewWindow
+      Remove-Item -Path $msiFilePath  -Force
+
+- task: PowerShell@2
+  displayName: print node version after install
+  inputs:
+    targetType: 'inline'
+    script: 'node --version'

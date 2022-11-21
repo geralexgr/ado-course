@@ -1,0 +1,23 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+- task: Docker@2
+  displayName: login on docker hub
+  inputs:
+    containerRegistry: 'dockerhub-connection'
+    command: 'login'
+
+- task: Docker@2
+  displayName: build image and push on azure container registry
+  inputs:
+    containerRegistry: 'dockerhub-connection'
+    repository: 'geralexgr/ado-course'
+    command: 'buildAndPush'
+    Dockerfile: '$(Build.SourcesDirectory)/dockerfiles/acr-build-push.Dockerfile'
+    buildContext: '$(Build.SourcesDirectory)'
+    tags: 'latest'

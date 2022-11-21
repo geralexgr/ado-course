@@ -1,0 +1,33 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: repo1
+      type: git
+      name: "projects"
+      ref: main
+
+steps:
+- checkout: self
+  displayName: Download self repo
+  path: "s/Source"
+
+- checkout: repo1
+  displayName: Download projects repo
+  path: "s/projects"
+
+- task: Npm@1
+  displayName: npm install
+  inputs:
+    command: 'install'
+    workingDir: '$(Build.SourcesDirectory)/projects/Node/'
+- task: Npm@1
+  displayName: npm run build
+  inputs:
+    command: 'custom'
+    workingDir: '$(Build.SourcesDirectory)/projects/Node/'
+    customCommand: 'run build'

@@ -1,0 +1,43 @@
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+  - name: surname
+    type: string
+  
+  - name: image
+    displayName: Pool Image
+    type: string
+    default: ubuntu-latest
+    values:
+    - windows-latest
+    - ubuntu-latest
+    - macOS-latest
+
+variables:
+  - group: library   
+
+  - name: var1
+    value: "Value of var1" 
+
+stages:
+- stage: stage1 
+  displayName: stage1
+  jobs:
+  - job: job1
+    displayName: job1
+    steps:
+
+      - script: echo ${{parameters.surname}}
+        displayName:  printing parameters input for surname
+      
+      - script: echo My name is $(Name) and my surname is ${{parameters.surname}}
+        displayName:  combining variables  and parameters     
+      
+      - script: echo Password value will be hidden $(Password)
+        displayName:  printing a secret 
+      
+      - script: echo local $(var1)
+        displayName:  printing a local variable 

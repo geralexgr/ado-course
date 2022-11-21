@@ -1,0 +1,31 @@
+trigger:
+  branches:
+    include:
+      - main
+      - releases/*
+    exclude:
+      - uat
+  paths:
+    include:
+      - docs
+    exclude:
+      - docs/README.md
+  tags:
+    include:
+      - v2.*
+    exclude:
+      - v5.0
+
+pr:
+  branches:
+    include:
+    - current
+    exclude:
+      - uat
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo Running pipeline with specific build strategy
+  displayName: 'pipeline run'

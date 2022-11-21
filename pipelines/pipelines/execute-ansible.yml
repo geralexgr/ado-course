@@ -1,0 +1,16 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+- task: Ansible@0
+  displayName: execute ansible command
+  inputs:
+    ansibleInterface: 'agentMachine'
+    playbookPathOnAgentMachine: '$(Build.SourcesDirectory)/ansible/hello-world-ansible.yml'
+    inventoriesAgentMachine: 'hostList'
+    inventoryHostListAgentMachine: 'localhost'
+    args: '-v'

@@ -1,0 +1,26 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+
+stages:
+- stage: deploystage
+  displayName: deployment stage
+  jobs:
+  - job: deployjob
+    displayName: deploy nginx on aks
+    steps:
+      
+      - task: Kubernetes@1
+        displayName: create a nginx deployment with kubectl commands
+        inputs:
+          connectionType: 'Kubernetes Service Connection'
+          kubernetesServiceEndpoint: 'k8s-geralexgr-aks'
+          namespace: 'nginx'
+          command: 'apply'
+          useConfigurationFile: true
+          configuration: '$(Build.SourcesDirectory)/k8s-deployments/nginx.yml'
+          secretType: 'dockerRegistry'
+          containerRegistryType: 'Azure Container Registry'

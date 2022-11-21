@@ -1,0 +1,26 @@
+trigger: none
+pr: none
+
+# schedules:
+# - cron: "0 5 * * *"
+#   displayName: Run pipeline based on schedule
+#   always: true
+#   branches:
+#     include:
+#     - main
+
+
+pool:
+  vmImage: ubuntu-latest
+
+jobs:
+- job: job1
+  displayName: Job to run periodically 
+    
+  steps: 
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        Write-Host "Running from a scheduled job"
+

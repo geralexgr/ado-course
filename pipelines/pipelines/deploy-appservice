@@ -1,0 +1,30 @@
+trigger:
+- none
+
+pool:
+  vmImage: windows-latest
+
+steps:
+
+- task: VSBuild@1
+  displayName: Build appservice
+  inputs:
+    solution: '$(Build.SourcesDirectory)/Front/**\*.sln'
+    msbuildArgs: '/p:Configuration=Debug /p:Platform="Any CPU" /p:WebPublishMethod=FileSystem /p:publishUrl="$(Build.ArtifactStagingDirectory)/build" /p:DeployOnBuild=true'
+    clean: true
+
+
+- task: ArchiveFiles@2
+  displayName: create archive for app service deployment
+  inputs:
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\build'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.StagingDirectory)/$(Build.BuildId).zip'
+    replaceExistingArchive: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'

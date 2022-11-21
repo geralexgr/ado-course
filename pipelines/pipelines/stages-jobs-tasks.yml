@@ -1,0 +1,66 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: BuildApp
+  displayName: Build Code
+  jobs:
+  - job: BuildFrontendApp
+    displayName: Build Frontend App
+    steps:
+    - script: echo building frontend app
+      displayName: build frontend app
+
+  - job: BuildBackendApp
+    displayName: Build Backend App
+    steps:
+    - script: echo building backend app
+      displayName: build backend app
+
+- stage: DeployDev
+  displayName: Deploy to DEV environment 
+  jobs:
+  - job: DeployFrontendDev
+    displayName: Deploy frontend to DEV
+    steps:
+    - script: echo deploying frontend app to DEV
+      displayName: deploy frontend app to DEV
+
+  - job: DeployBackendDev
+    displayName: Deploy backend to DEV
+    steps:
+    - script: echo deploying backend app to DEV
+      displayName: deploy backend app to DEV
+
+- stage: DeployQA
+  displayName: Deploy to QA environment 
+  jobs:
+  - job: DeployFrontendQA
+    displayName: Deploy frontend to QA
+    steps:
+    - script: echo deploying frontend app to QA
+      displayName: deploy frontend app to QA
+
+  - job: DeployBackendQA
+    displayName: Deploy backend to QA
+    steps:
+    - script: echo deploying backend app to QA
+      displayName: deploy backend app to QA
+
+- stage: DeployProd
+  displayName: Deploy to Prod environment 
+  jobs:
+  - job: DeployFrontendProd
+    displayName: Deploy frontend to Prod
+    steps:
+    - script: echo deploying frontend app to Prod
+      displayName: deploy frontend app to Prod
+
+  - job: DeployBackendProd
+    displayName: Deploy backend to Prod
+    steps:
+    - script: echo deploying backend app to Prod
+      displayName: deploy backend app to Prod
