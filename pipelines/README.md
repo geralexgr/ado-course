@@ -95,3 +95,6 @@ Use Jmeter for performance testing
 
 - **stage-dependencies**  
 Create deployment workflows with stage dependencies
+
+- **jobs-conditions**  
+Create execution workflows with job dependencies
