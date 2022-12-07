@@ -98,3 +98,6 @@ Create deployment workflows with stage dependencies
 
 - **jobs-conditions**  
 Create execution workflows with job dependencies
+
+- **dependson-variable**  
+Dynamic dependencies with variables and parameters

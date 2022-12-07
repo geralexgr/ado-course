@@ -12,6 +12,7 @@ https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/workin
 
 | Lecture | Date |
 | --- | --- |
+| dynamic dependsOn | 7-December-2022 |
 | jobs conditions | 21-November-2022 |
 | stage dependencies | 17-November-2022 |
 | jmeter load testing | 8-November-2022 |
