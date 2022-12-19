@@ -72,7 +72,7 @@ Update pipeline name by changing build number
 - **install-win-software**  
 Install software (exe, msi) on windows machines
 
-- **acr-build-push**  
+- **docker-build-push**  
 build docker image and push to docker hub registry
 
 - **execute-command**  
