@@ -12,7 +12,7 @@ https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/workin
 
 | Lecture | Date |
 | --- | --- |
-| build dotnet microservice and push on acr | 20-December-2022 |
+| build and push dotnet on acr | 20-December-2022 |
 | azure devops agents containers | 8-December-2022 |
 | dynamic dependsOn | 7-December-2022 |
 | jobs conditions | 21-November-2022 |
