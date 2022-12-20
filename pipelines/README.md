@@ -101,3 +101,8 @@ Create execution workflows with job dependencies
 
 - **dependson-variable**  
 Dynamic dependencies with variables and parameters
+
+- **acr-build-push**  
+Build dotnet microservice and push on container registry
+
+
