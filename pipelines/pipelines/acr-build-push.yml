@@ -1,0 +1,44 @@
+trigger:
+- none
+
+pr: none 
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: repo1
+      type: git
+      name: "projects"
+      ref: main
+
+variables:
+- name: REGISTRY
+  value: geralexgr
+
+
+stages:
+- stage: buildandpush
+  displayName: build dotnet application and push on acr
+  jobs:
+  - job: jon
+    displayName: build dotnet application and push on acr
+    steps:
+    - checkout: self
+      displayName: Download self repo
+      path: "s/Source"
+
+    - checkout: repo1
+      displayName: Download projects repo
+      path: "s/projects"
+
+    - task: AzureCLI@2
+      displayName: build dockerfile on acr
+      inputs:
+        azureSubscription: 'DEVOPSRG'
+        scriptType: 'pscore'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          cd "$(Build.SourcesDirectory)/projects/AspNetWebApi"
+          az acr build --registry $(REGISTRY) --image dotnetimage:v1 .
