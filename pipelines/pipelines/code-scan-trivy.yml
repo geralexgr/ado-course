@@ -1,0 +1,48 @@
+trigger:
+- none
+
+pr: none 
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: repo1
+      type: git
+      name: "projects"
+      ref: main
+
+
+stages:
+- stage: devsecops
+  displayName: Run DevSecOps checks
+  jobs:
+  - job: trivy
+    displayName: scan project using trivy
+    steps:
+    - checkout: self
+      displayName: Download self repo
+      path: "s/Source"
+
+    - checkout: repo1
+      displayName: Download projects repo
+      path: "s/projects"
+
+    - task: Bash@3
+      displayName: install trivy tool
+      inputs:
+        targetType: 'inline'
+        script: |          
+          sudo apt-get install wget apt-transport-https gnupg lsb-release
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy
+
+    - task: Bash@3
+      displayName: scan project for secrets, vuln, conf errors
+      inputs:
+        targetType: 'inline'
+        script: |          
+          trivy fs --security-checks vuln,secret,config $(Build.SourcesDirectory)/projects/AspNetWebApi

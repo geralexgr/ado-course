@@ -105,4 +105,7 @@ Dynamic dependencies with variables and parameters
 - **acr-build-push**  
 Build dotnet microservice and push on container registry
 
+- **trivy-scan**  
+Scan code projects using trivy
+
 

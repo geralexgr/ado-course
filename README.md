@@ -12,6 +12,7 @@ https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/workin
 
 | Lecture | Date |
 | --- | --- |
+| scan projects with trivy | 01-January-2023 |
 | build and push dotnet on acr | 20-December-2022 |
 | azure devops agents containers | 8-December-2022 |
 | dynamic dependsOn | 7-December-2022 |
