@@ -108,4 +108,7 @@ Build dotnet microservice and push on container registry
 - **trivy-scan**  
 Scan code projects using trivy
 
+- **snyk-scan-container**  
+Scan container images using snyk
+
 
