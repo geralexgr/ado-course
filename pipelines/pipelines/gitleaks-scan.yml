@@ -1,0 +1,51 @@
+trigger:
+- none
+
+pr: none 
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: repo1
+      type: git
+      name: "projects"
+      ref: main
+
+variables:
+ - name: gitleaks_download_link
+   value: https://github.com/gitleaks/gitleaks/releases/download/v8.16.1/gitleaks_8.16.1_linux_x64.tar.gz
+
+stages:
+- stage: devsecops
+  displayName: Scan for secrets and passwords
+  jobs:
+  - job: gitleaks
+    displayName: scan project for secrets and passwords
+    steps:
+    - checkout: self
+      displayName: Download self repo
+      path: "s/Source"
+
+    - checkout: repo1
+      displayName: Download projects repo
+      path: "s/projects"
+
+
+    - task: Bash@3
+      displayName: install gitleaks tool
+      inputs:
+        targetType: 'inline'
+        script: |          
+          wget $(gitleaks_download_link)
+          tar -xf ./gitleaks_8.16.1_linux_x64.tar.gz
+          chmod +x gitleaks
+          ./gitleaks
+
+    - task: Bash@3
+      displayName: gitleaks scannning
+      inputs:
+        targetType: 'inline'
+        script: |
+          ./gitleaks detect  -s $(Build.SourcesDirectory)/projects -v

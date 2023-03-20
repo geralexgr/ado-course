@@ -111,4 +111,6 @@ Scan code projects using trivy
 - **snyk-scan-container**  
 Scan container images using snyk
 
+- **gitleaks-scan**  
+Scan for secrets and passwords with gitleaks
 
