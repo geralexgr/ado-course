@@ -12,6 +12,7 @@ https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/workin
 
 | Lecture | Date |
 | --- | --- |
+| azure load testing | 25-March-2023 |
 | scan secrets and passwords with gitleaks | 20-March-2023 |
 | scan containers with snyk | 21-February-2023 |
 | scan projects with trivy | 01-January-2023 |

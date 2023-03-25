@@ -114,3 +114,6 @@ Scan container images using snyk
 - **gitleaks-scan**  
 Scan for secrets and passwords with gitleaks
 
+- **azure-load-testing**  
+Load test websites with Azure Load testing
+

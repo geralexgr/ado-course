@@ -1,0 +1,11 @@
+testId: geralexgr_test
+displayName: Load testing geralexgr.com
+testPlan: ../jmeter/geralexgr.com_plan.jmx
+engineInstances: 1
+#configurationFiles:
+#- something.config
+#env:
+#- name: webapp
+#  value: geralexgr.com
+#failureCriteria:
+#- MainPage: p90(response_time_ms) > 5000
