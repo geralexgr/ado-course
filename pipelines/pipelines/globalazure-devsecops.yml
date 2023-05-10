@@ -1,0 +1,198 @@
+trigger:
+- none
+
+pr: none 
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+- name: sonarcheck
+  displayName: Run Quality Gate check?
+  type: boolean
+  default: false
+
+resources:
+  repositories:
+    - repository: repo1
+      type: git
+      name: "projects"
+      ref: main
+
+variables:
+- name: REGISTRY
+  value: geralexgr
+- name: DOCKER_IMAGE
+  value: mycustomimage
+- name: DOCKER_REGISTRY_IMAGE
+  value: $(REGISTRY).azurecr.io/$(DOCKER_IMAGE):$(Build.BuildNumber)
+
+- group: globalazure
+
+stages:
+- stage: sonarqube
+  displayName: sonarqube scan
+  pool:
+    vmImage: windows-latest
+  jobs:
+  - job: sonarqube
+    displayName: sonarqube scan
+    steps:
+    - checkout: self
+      displayName: Download self repo
+      path: "s/Source"
+
+    - checkout: repo1
+      displayName: Download projects repo
+      path: "s/projects"
+
+    - task: SonarQubePrepare@5
+      displayName: SonarQube Prepare task
+      inputs:
+        SonarQube: 'shard-sonar'
+        scannerMode: 'MSBuild'
+        projectKey: $(Sonar_Project_Key)
+        
+    - task: DotNetCoreCLI@2
+      displayName: restore project
+      inputs:
+        command: 'restore'
+        projects: '$(Build.SourcesDirectory)/projects/AspNetWebApi/*.sln'
+        feedsToUse: 'select'
+    - task: MSBuild@1
+      displayName: build project
+      inputs:
+        solution: '$(Build.SourcesDirectory)/projects/AspNetWebApi/*.sln'
+        msbuildArguments: '/p:Configuration=Debug /p:Platform="Any CPU"'
+    - task: SonarQubeAnalyze@5
+      displayName: SonarQube Analyze
+    - task: SonarQubePublish@5
+      displayName: publish Quality Gate results
+      inputs:
+        pollingTimeoutSec: '300'
+    
+    - ${{ if eq(parameters.sonarcheck, true) }}:
+      - task: PowerShell@2
+        displayName: check Quality Gate results
+        inputs:
+          targetType: 'inline'
+          script: |
+            $sonar_token = "$(Sonar_Api_Key)"
+            $token = [System.Text.Encoding]::UTF8.GetBytes($sonar_token + ":")
+            $base64 = [System.Convert]::ToBase64String($token)
+            $basicAuth = [string]::Format("Basic {0}", $base64)
+            $headers = @{ Authorization = $basicAuth }
+            
+            $result = Invoke-RestMethod -Method Get -Uri "$(Sonar_Quality_Gate_Url)" -Headers $headers
+            $result | ConvertTo-Json | Write-Host
+            
+            if ($result.projectStatus.status -eq "OK") {
+            Write-Host "Quality Gate Succeeded"
+            }else{
+            throw "Quality gate failed"
+            }
+
+- stage: scancodejob
+  displayName: scan code
+  jobs:
+  - job: trivy
+    displayName: scan code project using trivy
+    steps:
+    - checkout: self
+      displayName: Download self repo
+      path: "s/Source"
+
+    - checkout: repo1
+      displayName: Download projects repo
+      path: "s/projects"
+
+    - task: Bash@3
+      displayName: install trivy tool
+      inputs:
+        targetType: 'inline'
+        script: |          
+          sudo apt-get install wget apt-transport-https gnupg lsb-release
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy
+
+    - task: Bash@3
+      displayName: scan project for secrets, vuln, conf errors
+      inputs:
+        targetType: 'inline'
+        script: |          
+          trivy fs --scanners vuln,secret,config $(Build.SourcesDirectory)/projects/AspNetWebApi/
+
+- stage: buildstage
+  dependsOn: scancodejob
+  condition: succeeded('scancodejob')
+  displayName: Build container image
+  jobs:
+  - job: docker
+    displayName: build container
+    steps:
+    - checkout: self
+      displayName: Download self repo
+      path: "s/Source"
+
+    - checkout: repo1
+      displayName: Download projects repo
+      path: "s/projects"
+
+
+    - task: AzureCLI@2
+      displayName: build and push dotnet on acr
+      inputs:
+        azureSubscription: 'geralexgr-azure'
+        scriptType: 'pscore'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          cd "$(Build.SourcesDirectory)/projects/AspNetWebApi"
+          az acr build --registry $(REGISTRY) --resource-group devops-infra --image $(DOCKER_IMAGE):$(Build.BuildNumber) .
+
+- stage: snykstage
+  dependsOn: buildstage
+  condition: succeeded('buildstage')
+  displayName: Scan container image
+  jobs:
+  - job: snyk
+    displayName: scan container using snyk
+    steps:
+    
+    - task: AzureCLI@2
+      displayName: pull image from acr
+      inputs:
+        azureSubscription: 'geralexgr-azure'
+        scriptType: 'pscore'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az acr login --name $(REGISTRY)
+          docker pull $(DOCKER_REGISTRY_IMAGE)
+
+    - task: SnykSecurityScan@1
+      displayName: scan container using snyk
+      inputs:
+        serviceConnectionEndpoint: 'snyk-cloud'
+        testType: 'container'
+        dockerImageName: '$(DOCKER_REGISTRY_IMAGE)'
+        severityThreshold: 'medium'
+        monitorWhen: 'always'
+        failOnIssues: true
+        organization: 'geralexgr'
+
+- stage: deploy
+  dependsOn: snykstage
+  condition: succeeded('snykstage')
+  displayName: Deploy application
+  jobs:
+  - job: deployapp
+    displayName: deploy asp .net web api
+    steps:
+
+    - task: PowerShell@2
+      displayName: deploy web app
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "Deployment started"
