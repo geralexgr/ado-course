@@ -23,7 +23,7 @@ variables:
 - name: REGISTRY
   value: geralexgr
 - name: DOCKER_IMAGE
-  value: mycustomimage
+  value: globalazuregreece.2023
 - name: DOCKER_REGISTRY_IMAGE
   value: $(REGISTRY).azurecr.io/$(DOCKER_IMAGE):$(Build.BuildNumber)
 
