@@ -117,3 +117,6 @@ Scan for secrets and passwords with gitleaks
 - **azure-load-testing**  
 Load test websites with Azure Load testing
 
+- **sonarqube-scan**  
+Use Quality Gates and scan source code with sonarqube
+

@@ -1,0 +1,86 @@
+trigger:
+- none
+
+pr: none 
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+- name: sonarcheck
+  displayName: Run Quality Gate check?
+  type: boolean
+  default: false
+
+resources:
+  repositories:
+    - repository: repo1
+      type: git
+      name: "projects"
+      ref: main
+
+variables:
+- group: globalazure
+
+stages:
+- stage: sonarqube
+  displayName: sonarqube scan
+  pool:
+    vmImage: windows-latest
+  jobs:
+  - job: sonarqube
+    displayName: sonarqube scan
+    steps:
+    - checkout: self
+      displayName: Download self repo
+      path: "s/Source"
+
+    - checkout: repo1
+      displayName: Download projects repo
+      path: "s/projects"
+
+    - task: SonarQubePrepare@5
+      displayName: SonarQube Prepare task
+      inputs:
+        SonarQube: 'shard-sonar'
+        scannerMode: 'MSBuild'
+        projectKey: $(Sonar_Project_Key)
+        
+    - task: DotNetCoreCLI@2
+      displayName: restore project
+      inputs:
+        command: 'restore'
+        projects: '$(Build.SourcesDirectory)/projects/AspNetWebApi/*.sln'
+        feedsToUse: 'select'
+    - task: MSBuild@1
+      displayName: build project
+      inputs:
+        solution: '$(Build.SourcesDirectory)/projects/AspNetWebApi/*.sln'
+        msbuildArguments: '/p:Configuration=Debug /p:Platform="Any CPU"'
+    - task: SonarQubeAnalyze@5
+      displayName: SonarQube Analyze
+    - task: SonarQubePublish@5
+      displayName: publish Quality Gate results
+      inputs:
+        pollingTimeoutSec: '300'
+    
+    - ${{ if eq(parameters.sonarcheck, true) }}:
+      - task: PowerShell@2
+        displayName: check Quality Gate results
+        inputs:
+          targetType: 'inline'
+          script: |
+            $sonar_token = "$(Sonar_Api_Key)"
+            $token = [System.Text.Encoding]::UTF8.GetBytes($sonar_token + ":")
+            $base64 = [System.Convert]::ToBase64String($token)
+            $basicAuth = [string]::Format("Basic {0}", $base64)
+            $headers = @{ Authorization = $basicAuth }
+            
+            $result = Invoke-RestMethod -Method Get -Uri "$(Sonar_Quality_Gate_Url)" -Headers $headers
+            $result | ConvertTo-Json | Write-Host
+            
+            if ($result.projectStatus.status -eq "OK") {
+            Write-Host "Quality Gate Succeeded"
+            }else{
+            throw "Quality gate failed"
+            }
