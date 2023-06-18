@@ -12,6 +12,7 @@ https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/workin
 
 | Lecture | Date |
 | --- | --- |
+| run pipeline after another | 18-June-2023 |
 | sonarqube scan | 25-May-2023 |
 | azure load testing | 25-March-2023 |
 | scan secrets and passwords with gitleaks | 20-March-2023 |

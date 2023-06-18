@@ -1,0 +1,9 @@
+trigger:
+- none
+
+pool:
+  vmImage: windows-latest
+
+steps:
+- script: echo This is the first pipeline running
+  displayName: pipeline1

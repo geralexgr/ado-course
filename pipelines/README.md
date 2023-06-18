@@ -120,3 +120,5 @@ Load test websites with Azure Load testing
 - **sonarqube-scan**  
 Use Quality Gates and scan source code with sonarqube
 
+- **run-pipeline-after-another**  
+Run pipeline after another finishes execution

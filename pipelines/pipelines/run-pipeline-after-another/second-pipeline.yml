@@ -1,0 +1,18 @@
+resources:
+  pipelines:
+  - pipeline: DoesNotMatter #identifier for the resource used in pipeline resource variables
+    project: test-project # project for the source; optional for current project
+    source: first-pipeline #name of the pipeline that will run first
+    trigger:  #which branch will execute the execution
+      branches:  
+        include: 
+        - main
+        exclude: 
+        - develop
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo This is the second pipeline running
+  displayName: pipeline2
