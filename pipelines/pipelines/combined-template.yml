@@ -1,0 +1,12 @@
+trigger:
+- none
+
+variables:
+- template: templates/vars.yml  
+pool:
+  vmImage: $(myagent)
+
+stages:
+- template: templates/stage.yml  
+  parameters:
+    name: "App_Env1"

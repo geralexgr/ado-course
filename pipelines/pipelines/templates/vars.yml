@@ -1,0 +1,11 @@
+# File: variables/build.yml
+variables:
+
+- name: myagent
+  value: ubuntu-latest
+
+- name: arch
+  value: x64
+
+- name: config
+  value: debug

@@ -1,0 +1,8 @@
+parameters:
+  name: ''
+
+
+steps:
+
+- script: echo ${{ parameters.name }}
+  displayName: running  ${{ parameters.name }}

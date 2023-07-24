@@ -1,0 +1,10 @@
+parameters:
+  name: ''
+
+stages:
+
+- stage: ${{ parameters.name }}
+  jobs:    
+  - template: job.yml
+    parameters:
+      name: ${{ parameters.name }}_build_job

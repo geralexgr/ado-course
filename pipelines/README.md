@@ -122,3 +122,6 @@ Use Quality Gates and scan source code with sonarqube
 
 - **run-pipeline-after-another**  
 Run pipeline after another finishes execution
+
+- **combined-template**  
+Templates for tasks,jobs and stages (nested templates)

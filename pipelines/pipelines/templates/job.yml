@@ -1,0 +1,17 @@
+parameters:
+  name: ''
+  sign: false
+
+jobs:
+
+- job: ${{ parameters.name }}
+  displayName: running ${{ parameters.name }} 
+  steps:
+
+  - template: step.yml
+    parameters:
+      name: task1
+
+  - ${{ if eq(parameters.sign, 'true') }}:
+    - script: echo sign is requested
+      displayName: sign task
