@@ -1,0 +1,33 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: deploy_stage
+  displayName: terraform stage
+  jobs:
+  - job: deploy_job
+    displayName: terraform job
+    steps:
+    - task: TerraformInstaller@1
+      displayName: terraform install
+      inputs:
+        terraformVersion: 'latest'
+    - task: TerraformTaskV4@4
+      displayName: terraform init
+      inputs:
+        provider: 'aws'
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/aws'
+        backendServiceAWS: 'aws-eu-west-1'
+        backendAWSBucketName: 'terraform'
+        backendAWSKey: 'terraform.tfstate'
+    - task: TerraformTaskV4@4
+      displayName: terraform apply
+      inputs:
+        provider: 'aws'
+        command: 'apply'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/aws'
+        environmentServiceNameAWS: 'aws-eu-west-1'

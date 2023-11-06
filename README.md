@@ -12,6 +12,7 @@ https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/workin
 
 | Lecture | Date |
 | --- | --- |
+| aws deployment | 6-Nov-2023 |
 | nested templates | 24-July-2023 |
 | run pipeline after another | 18-June-2023 |
 | sonarqube scan | 25-May-2023 |

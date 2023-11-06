@@ -125,3 +125,6 @@ Run pipeline after another finishes execution
 
 - **combined-template**  
 Templates for tasks,jobs and stages (nested templates)
+
+- **aws-terraform-deployment**  
+Deploy resources on aws using terraform
